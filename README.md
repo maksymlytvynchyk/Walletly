@@ -1,64 +1,64 @@
-Walletly
+# Walletly
 
 A full-stack pet project for personal finance management. Users can create demo cards, record income and expenses, transfer money between cards, and review their transaction history.
 
 This is an educational project. It does not process real payments and must not be used to store real banking data.
 
-Features
+## Features
 
-User registration and authentication.
+- User registration and authentication.
 
-Validation of full name, phone number, email, date of birth, and password.
+- Validation of full name, phone number, email, date of birth, and password.
 
-Creation of demo Visa and Mastercard cards.
+- Creation of demo Visa and Mastercard cards.
 
-Card number generation using the Luhn algorithm.
+- Card number generation using the Luhn algorithm.
 
-Demo IBAN generation.
+- Demo IBAN generation.
 
-Support for UAH, USD, and EUR.
+- Support for UAH, USD, and EUR.
 
-Income and expense tracking.
+- Income and expense tracking.
 
-Transfers between cards in the same currency.
+- Transfers between cards in the same currency.
 
-Transaction history.
+- Transaction history.
 
-Total balance calculation in UAH.
+- Total balance calculation in UAH.
 
-Exchange-rate retrieval with fallback values.
+- Exchange-rate retrieval with fallback values.
 
-Ukrainian-language Vue interface.
+- Ukrainian-language Vue interface.
 
 Tech Stack
 
-Backend
+#### Backend
 
-Python
+- Python
 
-FastAPI
+- FastAPI
 
-Async SQLAlchemy
+- Async SQLAlchemy
 
-PostgreSQL
+- PostgreSQL
 
-asyncpg
+- asyncpg
 
-Pydantic
+- Pydantic
 
-Alembic
+- Alembic
 
-pytest
+- pytest
 
-Frontend
+#### Frontend
 
-Vue 3
+- Vue 3
 
-Vite
+- Vite
 
-Tailwind CSS
+- Tailwind CSS
 
-JavaScript
+- JavaScript
 
 ## Project Structure
 
@@ -261,23 +261,23 @@ pytest tests/integration_tests -v
 
 Integration tests use a separate PostgreSQL database and Alembic migrations.
 
-Limitations and Future Improvements
+## Limitations and Future Improvements
 
-Cross-currency transfers with exchange-rate conversion.
+- Cross-currency transfers with exchange-rate conversion.
 
-Pagination and filtering for transaction history.
+- Pagination and filtering for transaction history.
 
-Logout, token expiration, and session revocation.
+- Logout, token expiration, and session revocation.
 
-Docker Compose for FastAPI, PostgreSQL, and the frontend.
+- Docker Compose for FastAPI, PostgreSQL, and the frontend.
 
-GitHub Actions CI.
+- GitHub Actions CI.
 
-End-to-end tests with Playwright.
+- End-to-end tests with Playwright.
 
-Masking card data in API responses.
+- Masking card data in API responses.
 
-Demo card data only.
+- Demo card data only.
 
 Author
 
