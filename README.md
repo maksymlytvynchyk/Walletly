@@ -60,8 +60,9 @@ Tailwind CSS
 
 JavaScript
 
-Project Structure
+## Project Structure
 
+```text
 FastAPI/
 ├── app/
 │   ├── api/               # API routes
@@ -81,12 +82,13 @@ FastAPI/
 ├── main.py
 ├── requirements.txt
 └── alembic.ini
+```
 
-Installation and Setup
+## Installation and Setup
 
 1. Clone the repository
 
-git clone <YOUR_REPOSITORY_URL>
+git clone https://github.com/maksymlytvynchyk/Walletly.git
 cd FastAPI
 
 2. Create and activate a virtual environment
@@ -247,4 +249,4 @@ Demo card data only.
 
 Author
 
-GitHub: <YOUR_GITHUB_URL>
+GitHub: https://github.com/maksymlytvynchyk/Walletly.git
