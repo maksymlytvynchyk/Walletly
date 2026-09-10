@@ -89,6 +89,7 @@ FastAPI/
 1. Clone the repository
 
 git clone https://github.com/maksymlytvynchyk/Walletly.git
+
 cd FastAPI
 
 2. Create and activate a virtual environment
