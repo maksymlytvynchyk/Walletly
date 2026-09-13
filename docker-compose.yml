@@ -1,0 +1,68 @@
+services:
+  db:
+    image: postgres
+    container_name: walletly-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: finance_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345678
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d finance_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  
+  app:
+    build: .
+    container_name: walletly-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: finance_db
+      DB_USER: postgres
+      DB_PASSWORD: 12345678
+
+  db_test:
+    image: postgres:17-alpine
+    container_name: walletly-test-db
+    environment:
+      POSTGRES_DB: finance_test
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345678
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d finance_test"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - postgres_test_data:/var/lib/postgresql
+    profiles:
+      - test
+    
+  tests:
+    build: .
+    depends_on:
+      db_test:
+        condition: service_healthy
+    environment:
+      DB_HOST: db_test
+      DB_PORT: 5432
+      DB_NAME: finance_test
+      DB_USER: postgres
+      DB_PASSWORD: 12345678
+    command: pytest tests/integration_tests -v
+    profiles:
+      - test
+
+volumes:
+  postgres_data:
+  postgres_test_data:

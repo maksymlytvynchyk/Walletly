@@ -1,12 +1,5 @@
-import asyncio
-import sys
-
-# if sys.platform == "win32":
-#     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-
 import os
 from collections.abc import AsyncGenerator
-
 import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
@@ -21,43 +14,27 @@ from sqlalchemy.pool import NullPool
 from dotenv import load_dotenv
 os.environ["PGGSSLIB"] = "disable"
 
-load_dotenv(".env.test")
+load_dotenv()
+
+DB_HOST = os.getenv("DB_HOST")
+DB_PORT = os.getenv("DB_PORT")
+DB_NAME = os.getenv("DB_NAME")
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+
 from app.database import Base
 from app.dependency import get_db
 from app.models import Card, Operation, User
 from main import app
 
 
-
-TEST_DATABASE_URL = os.environ["TEST_DATABASE_URL"]
-
-
-# @pytest_asyncio.fixture(scope="session")
-# async def db_engine() -> AsyncGenerator[AsyncEngine, None]:
-#     """Створює глобальний AsyncEngine."""
-#     engine = create_async_engine(
-#         TEST_DATABASE_URL,
-#         connect_args={
-#             "ssl": False,
-#             "gsslib": "sspi",  # Запобігає помилкам SSPI/GSSAPI на Windows
-#         },
-#         poolclass=NullPool,  # Уникає зависання закритих сокетів у пулі
-#     )
-#     yield engine
-#     await engine.dispose()
-
+TEST_DATABASE_URL = f"postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 @pytest_asyncio.fixture(scope="session")
 async def db_engine() -> AsyncGenerator[AsyncEngine, None]:
-    # create_engine — наша обёртка над create_async_engine (контекстный менеджер)
     test_engine = create_async_engine(TEST_DATABASE_URL, connect_args={"ssl": False, "gsslib": "sspi"}, poolclass=NullPool)
     yield test_engine
     await test_engine.dispose()
-    # async with create_async_engine(TEST_DATABASE_URL) as engine:
-    #     async with engine.begin() as conn:
-    #         await conn.run_sync(Base.metadata.drop_all)
-    #         await conn.run_sync(Base.metadata.create_all)
-    #     yield engine  
 
 @pytest_asyncio.fixture(scope="session")
 async def session_factory(db_engine: AsyncEngine) -> async_sessionmaker[AsyncSession]:
@@ -79,12 +56,6 @@ async def db_session(db_engine: AsyncEngine) -> AsyncGenerator[AsyncEngine, None
     )
     async with SessionLocal() as session:
         yield session
-    # return async_sessionmaker(
-    #     bind=db_engine,
-    #     class_=AsyncSession,
-    #     expire_on_commit=False,
-    #     autoflush=False,
-    # )
 
 
 @pytest_asyncio.fixture(scope="session", autouse=True)
@@ -123,13 +94,6 @@ async def clean_database(session_factory):
             await session.execute(delete(Operation))
             await session.execute(delete(Card))
             await session.execute(delete(User))
-
-
-# @pytest_asyncio.fixture
-# async def db_session(session_factory: async_sessionmaker[AsyncSession]) -> AsyncGenerator[AsyncSession, None]:
-#     """Фікстура для отримання БД-сесії всередині тесту."""
-#     async with session_factory() as session:
-#         yield session
 
 
 @pytest_asyncio.fixture

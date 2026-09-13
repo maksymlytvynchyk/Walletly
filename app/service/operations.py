@@ -174,7 +174,7 @@ async def transfer(
         amount=payload.amount,
         currency=payload.currency,
         category="Transfer",
-        subcategory="Withdrawal ",
+        subcategory="Withdrawal",
     )
 
     # Create the operation record for the destination card

@@ -37,7 +37,7 @@ async def test_register_user_creates_hashed_password(
 
 async def test_login_returns_access_token(client) -> None:
     registration_payload = {
-        "full_name": "Іван Петренко",
+        "full_name": "Петренко Іван Олексійович",
         "phone": "+380501234567",
         "password": "StrongPassword123",
         "birth_date": "2000-01-01",

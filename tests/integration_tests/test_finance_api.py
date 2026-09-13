@@ -8,7 +8,7 @@ def as_decimal(value) -> Decimal:
 
 async def register_and_login(client) -> dict[str, str]:
     registration_payload = {
-        "full_name": "Іван Петренко",
+        "full_name": "Петренко Іван Олексійович",
         "phone": "+380501234567",
         "password": "StrongPassword123",
         "birth_date": "2000-01-01",
@@ -21,7 +21,9 @@ async def register_and_login(client) -> dict[str, str]:
         json=registration_payload
     )
     
-    assert registration_response.status_code == 200
+    assert registration_response.status_code == 200, (
+        registration_response.json()
+    )
     
     login_response = await client.post(
         "/api/v1/auth/login",
@@ -214,4 +216,4 @@ async def test_transfer_updates_both_balances_and_creates_operations(
     assert {
         operation["subcategory"]
         for operation in operations
-    } == {"Deduction", "Credit"}
+    } == {"Receipt", "Withdrawal"}

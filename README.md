@@ -84,88 +84,93 @@ FastAPI/
 └── alembic.ini
 ```
 
-## Installation and Setup
+## Run with Docker
 
-1. Clone the repository
+### Requirements
 
-```text
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+- Git
+
+### 1. Clone the repository
+
+```bash
 git clone https://github.com/maksymlytvynchyk/Walletly.git
-cd FastAPI
+cd Walletly
 ```
 
-2. Create and activate a virtual environment
+### 2. Configure environment variables
 
-```powershell
-python -m venv .venv
-.venv\Scripts\Activate.ps1
-```
-
-3. Install Python dependencies
-
-```powershell
-pip install -r requirements.txt
-```
-
-4. Create an environment file
-
-Create .env in the project root:
+Create a `.env` file in the project root:
 
 ```env
-DB_HOST=127.0.0.1
-DB_PORT=5432
-DB_NAME=finance_db
-DB_USER=postgres
-DB_PASSWORD=your_password
+DB_HOST: db
+DB_PORT: 5432
+DB_NAME: finance_db
+DB_USER: postgres
+DB_PASSWORD: change_this_password
+
 ```
 
-5. Create the PostgreSQL database
+> Do not commit `.env` to Git.
 
-```sql
-CREATE DATABASE finance_db;
-```
-
-6. Apply migrations
+### 3. Build and start the application
 
 ```powershell
-alembic upgrade head
+docker compose up --build
 ```
 
-7. Run the backend
+Docker Compose starts:
 
-```powershell
-uvicorn main:app --reload
-```
+- `walletly-app` — FastAPI application with the built Vue frontend;
+- `walletly-db` — PostgreSQL database.
 
-The backend will be available at:
+The application will be available at:
 
 ```text
-http://127.0.0.1:8000
+http://localhost:8000
 ```
 
 Swagger documentation:
 
 ```text
-http://127.0.0.1:8000/docs
+http://localhost:8000/docs
 ```
 
-Running the Frontend in Development Mode
+### 4. Apply database migrations
+
+Open another terminal and run:
 
 ```powershell
-cd frontend
-npm install
-npm run dev
+docker compose exec app alembic upgrade head
 ```
 
-Vite runs the frontend and proxies /api requests to FastAPI.
+### Useful Docker Commands
 
-Frontend Production Build
+Start containers in the background:
 
 ```powershell
-cd frontend
-npm run build
+docker compose up -d --build
 ```
 
-After the build, FastAPI serves the frontend from frontend/dist.
+View application logs:
+
+```powershell
+docker compose logs -f app
+```
+
+Stop containers:
+
+```powershell
+docker compose down
+```
+
+Stop containers and remove the PostgreSQL data volume:
+
+```powershell
+docker compose down -v
+```
+
+> `docker compose down -v` permanently removes the Docker database data.
 
 ## API Endpoints
 
