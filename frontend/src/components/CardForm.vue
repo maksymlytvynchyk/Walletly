@@ -25,11 +25,11 @@ function submit() {
 <template>
   <form class="card space-y-3" @submit.prevent="submit">
     <h2 class="text-lg font-bold">
-      Нова картка
+      {{ $t("cardForm.newCard") }}
     </h2>
 
     <label>
-      Платіжна система
+      {{ $t("cardForm.paymentSystem") }}
 
       <select v-model="form.payment_system">
         <option value="visa">
@@ -43,25 +43,25 @@ function submit() {
     </label>
 
     <label>
-      Тип картки
+      {{ $t("cardForm.cardType") }}
 
       <select v-model="form.card_type">
         <option value="debit">
-          Дебетова
+          {{ $t("cardForm.debit") }}
         </option>
 
         <option value="credit">
-          Кредитна
+          {{ $t("cardForm.credit") }}
         </option>
 
         <option value="overdraft">
-          Овердрафт
+          {{ $t("cardForm.overdraft") }}
         </option>
       </select>
     </label>
 
     <label>
-      Початковий баланс
+      {{ $t("cardForm.initialBalance") }}
 
       <input
         v-model.number="form.initial_balance"
@@ -73,7 +73,7 @@ function submit() {
     </label>
 
     <label>
-      Валюта
+      {{ $t("cardForm.currency") }}
 
       <select v-model="form.currency">
         <option value="uah">
@@ -91,7 +91,7 @@ function submit() {
     </label>
 
     <button class="btn btn-primary w-full">
-      Створити картку
+      {{ $t("cardForm.createCard") }}
     </button>
   </form>
 </template>

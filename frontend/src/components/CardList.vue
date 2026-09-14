@@ -21,7 +21,7 @@ function formatCardNumber(cardNumber) {
   <section class="card mb-6">
     <div class="mb-4 flex items-center justify-between">
       <h2 class="text-lg font-bold">
-        Картки
+        {{ $t("cardList.cards") }}
       </h2>
 
       <span
@@ -67,7 +67,7 @@ function formatCardNumber(cardNumber) {
         </p>
 
         <p class="mt-2 text-xs text-slate-500">
-          Дійсна до: {{ card.expires_at }}
+          {{ $t("cardList.validUntil") }}: {{ card.expires_at }}
         </p>
       </article>
     </div>
@@ -76,7 +76,7 @@ function formatCardNumber(cardNumber) {
       v-else
       class="text-sm text-slate-500"
     >
-      Карток ще немає.
+      {{ $t("cardList.cardsDontExists") }}
     </p>
   </section>
 </template>

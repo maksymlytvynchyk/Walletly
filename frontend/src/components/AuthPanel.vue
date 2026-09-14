@@ -40,17 +40,17 @@ const handleRegister = async (payload) => {
 <template>
   <section class="mx-auto mt-14 max-w-md card">
     <p class="mb-2 text-xs font-bold tracking-[0.18em] text-brand-700">
-      ОСОБИСТІ ФІНАНСИ
+      {{ $t("auth.eyebrow") }}
     </p>
 
     <h1 class="text-3xl font-bold tracking-tight">
-      Керуйте грошима просто
+      {{ $t("auth.title") }}
     </h1>
 
     <p class="mt-2 text-slate-600">
       {{ mode === 'login'
-        ? 'Увійдіть у свій акаунт.'
-        : 'Створіть новий акаунт.'
+        ? $t("auth.loginDescription")
+        : $t("auth.createNewAcc")
       }}
     </p>
 
@@ -68,26 +68,26 @@ const handleRegister = async (payload) => {
 
     <div class="mt-6 text-center text-sm text-slate-600">
       <template v-if="mode === 'login'">
-        Немає акаунта?
+        {{ $t("auth.registerDescription") }}
 
         <button
           type="button"
           class="font-semibold text-brand-700 hover:underline"
           @click="showRegister"
         >
-          Зареєструватися
+          {{ $t("auth.register") }}
         </button>
       </template>
 
       <template v-else>
-        Вже маєте акаунт?
+        {{ $t("register.haveAcc") }}
 
         <button
           type="button"
           class="font-semibold text-brand-700 hover:underline"
           @click="showLogin"
         >
-          Увійти
+          {{ $t("auth.login") }}
         </button>
       </template>
     </div>

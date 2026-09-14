@@ -80,27 +80,27 @@ function submit() {
     @submit.prevent="submit"
   >
     <h2 class="text-lg font-bold">
-      Нова операція
+      {{ $t("operationForm.newOperation") }}
     </h2>
 
     <!-- Тип операції -->
     <label>
-      Тип
+      {{ $t("operationForm.type") }}
 
       <select v-model="form.type">
         <option value="income">
-          Дохід
+          {{ $t("operationForm.income") }}
         </option>
 
         <option value="expense">
-          Витрата
+          {{ $t("operationForm.expense") }}
         </option>
       </select>
     </label>
 
     <!-- Картка -->
     <label>
-      Картка
+      {{ $t("operationForm.card") }}
 
       <select
         v-model="form.card_id"
@@ -121,7 +121,7 @@ function submit() {
 
     <!-- Сума -->
     <label>
-      Сума
+      {{ $t("operationForm.sum") }}
 
       <input
         v-model="form.amount"
@@ -134,7 +134,7 @@ function submit() {
 
     <!-- Валюта -->
     <label>
-      Валюта
+      {{ $t("operationForm.currency") }}
 
       <select
         v-model="form.currency"
@@ -156,23 +156,23 @@ function submit() {
 
     <!-- Категорія -->
     <label>
-      Категорія
+      {{ $t("operationForm.category") }}
 
       <input
         v-model="form.category"
         maxlength="127"
-        placeholder="Наприклад, Їжа"
+        :placeholder="$t('operationForm.categoryPlaceholder')"
       />
     </label>
 
     <!-- Підкатегорія -->
     <label>
-      Підкатегорія
+      {{ $t("operationForm.subcategory") }}
 
       <input
         v-model="form.subcategory"
         maxlength="127"
-        placeholder="Наприклад, Продукти"
+        :placeholder="$t('operationForm.subcategoryPlaceholder')"
       />
     </label>
 
@@ -180,7 +180,7 @@ function submit() {
       class="btn btn-primary w-full"
       :disabled="!cards.length"
     >
-      Додати
+      {{ $t("operationForm.add") }}
     </button>
   </form>
 </template>

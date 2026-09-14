@@ -1,12 +1,12 @@
 <script setup>
 import { ref } from 'vue'
+import { vMaska } from 'maska/vue'
 
 defineProps({
   loading: Boolean,
 })
 
 const emit = defineEmits(['submit'])
-
 const phone = ref('')
 const password = ref('')
 
@@ -18,27 +18,27 @@ const submit = () => {
 <template>
   <form class="mt-6 space-y-4" @submit.prevent="submit">
     <label>
-      Номер телефону
+      {{ $t("auth.phone") }}
 
       <input
         v-model="phone"
+        v-maska="'+380 (##) ###-##-##'"
         type="tel"
         required
         maxlength="20"
-        placeholder="+380 50 123 45 67"
+        placeholder="+380 (__) ___-__-__"
         autocomplete="tel"
       />
     </label>
-
     <label>
-      Пароль
+      {{ $t("auth.password") }}
 
       <input
         v-model="password"
         type="password"
         required
         maxlength="128"
-        placeholder="Введіть пароль"
+        :placeholder="$t('auth.enterPassword')"
         autocomplete="current-password"
       />
     </label>
@@ -48,7 +48,7 @@ const submit = () => {
       class="btn btn-primary w-full"
       :disabled="loading"
     >
-      {{ loading ? 'Вхід...' : 'Увійти' }}
+      {{ loading ? $t("auth.loginProcess") : $t("auth.login") }}
     </button>
   </form>
 </template>

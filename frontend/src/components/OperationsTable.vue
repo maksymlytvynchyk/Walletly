@@ -46,7 +46,7 @@ function cardLabel(operation) {
   <section class="card mt-6 overflow-hidden p-0">
     <div class="p-5">
       <h2 class="text-lg font-bold">
-        Останні операції
+        {{ $t("operationTable.lastOperations") }}
       </h2>
     </div>
 
@@ -55,23 +55,23 @@ function cardLabel(operation) {
         <thead class="bg-slate-50 text-slate-500">
           <tr>
             <th class="px-5 py-3 font-semibold">
-              Дата
+              {{ $t("operationTable.date") }}
             </th>
 
             <th class="px-5 py-3 font-semibold">
-              Тип
+              {{ $t("operationTable.type") }}
             </th>
 
             <th class="px-5 py-3 font-semibold">
-              Картка
+              {{ $t("operationTable.card") }}
             </th>
 
             <th class="px-5 py-3 font-semibold">
-              Категорія
+              {{ $t("operationTable.category") }}
             </th>
 
             <th class="px-5 py-3 text-right font-semibold">
-              Сума
+              {{ $t("operationTable.sum") }}
             </th>
           </tr>
         </thead>
@@ -82,7 +82,7 @@ function cardLabel(operation) {
               colspan="5"
               class="px-5 py-7 text-center text-slate-500"
             >
-              Операцій ще немає.
+              {{ $t("operationTable.operationsDontExists") }}
             </td>
           </tr>
 

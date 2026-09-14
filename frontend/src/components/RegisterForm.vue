@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import { IMaskDirective as vImask } from 'vue-imask'
+import { vMaska } from 'maska/vue'
 
 defineProps({
     loading: Boolean,
@@ -17,10 +17,6 @@ const birthDate = ref('')
 const email = ref('')
 const gender = ref('')
 
-const phoneMask = {
-    mask: '+380 (00) 000-00-00',
-    lazy: false,
-}
 
 const getMaxBirthDate = () => {
     const today = new Date()
@@ -40,7 +36,7 @@ const submit = () => {
     passwordError.value = ''
 
     if (password.value !== passwordConfirm.value) {
-        passwordError.value = 'Паролі не збігаються'
+        passwordError.value = $t("register.passwordsNotSame")
         return
     }
 
@@ -58,54 +54,54 @@ const submit = () => {
 <template>
     <form class="mt-6 space-y-4" @submit.prevent="submit">
         <label>
-            ПІБ
+            {{ $t("register.fullName") }}
 
             <input v-model="fullName" type="text" required minlength="3" maxlength="127"
-                placeholder="Наприклад, Іван Петренко" autocomplete="name" />
+                :placeholder="$t('register.fullNameExample')" autocomplete="name" />
         </label>
 
         <label>
-            Номер телефону
+            {{ $t("register.phone") }}
 
-            <input v-model="phone" v-imask="phoneMask" type="text" required minlength="10" maxlength="20" placeholder="+380 (__) ___-__-__"
+            <input v-model="phone" v-maska="'+380 (##) ###-##-##'" type="tel" required minlength="10" maxlength="20" placeholder="+380 (__) ___-__-__"
                 autocomplete="tel" />
         </label>
 
         <label>
-            Електронна пошта
+            {{ $t("register.email") }}
 
             <input v-model="email" type="email" required maxlength="255" placeholder="ivan@example.com"
                 autocomplete="email" />
         </label>
 
         <label>
-            Дата народження
+            {{ $t("register.birthDate") }}
 
             <input v-model="birthDate" type="date" required :max="maxBirthDate" autocomplete="bday" />
         </label>
 
         <label>
-            Стать
+            {{ $t("register.gender") }}
 
             <select v-model="gender" required>
-                <option value="" disabled>Оберіть стать</option>
-                <option value="male">Чоловіча</option>
-                <option value="female">Жіноча</option>
+                <option value="" disabled>{{ $t("register.genderSelect") }}</option>
+                <option value="male">{{ $t("register.genderMale") }}</option>
+                <option value="female">{{ $t("register.genderFemale") }}</option>
             </select>
         </label>
 
         <label>
-            Пароль
+            {{ $t("register.password") }}
 
             <input v-model="password" type="password" required minlength="8" maxlength="128"
-                placeholder="Мінімум 8 символів" autocomplete="new-password" />
+                :placeholder="$t('register.passwordPlaceholder')" autocomplete="new-password" />
         </label>
 
         <label>
-            Підтвердження пароля
+            {{ $t("register.passwordConfirm") }}
 
             <input v-model="passwordConfirm" type="password" required minlength="8" maxlength="128"
-                placeholder="Повторіть пароль" autocomplete="new-password" />
+                :placeholder="$t('register.passwordConfirmPlaceholder')" autocomplete="new-password" />
         </label>
 
         <p v-if="passwordError" class="text-sm text-red-600">
@@ -113,7 +109,7 @@ const submit = () => {
         </p>
 
         <button type="submit" class="btn btn-primary w-full" :disabled="loading">
-            {{ loading ? 'Створення...' : 'Зареєструватися' }}
+            {{ loading ? $t("auth.registerProcess") : $t("auth.register") }}
         </button>
     </form>
 </template>

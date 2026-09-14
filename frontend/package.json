@@ -9,8 +9,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "flag-icons": "^7.5.0",
     "imask": "^7.6.1",
+    "maska": "^3.2.1",
     "vue": "^3.5.0",
+    "vue-i18n": "^11.4.10",
     "vue-imask": "^7.6.1"
   },
   "devDependencies": {

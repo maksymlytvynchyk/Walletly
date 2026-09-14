@@ -27,7 +27,10 @@ onMounted(() => {
   />
 
   <main class="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-
+    <LanguageSwitcher
+      v-if="!finance.authenticated.value"
+      class="mb-4 ml-auto block w-fit"
+    />
     <!-- Повідомлення -->
     <p
       v-if="finance.notice.value || finance.error.value"

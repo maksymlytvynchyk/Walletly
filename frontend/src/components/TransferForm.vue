@@ -32,16 +32,6 @@ const availableToCards = computed(() => {
   }
 
   return props.cards.filter((card) => Number(card.id) !== Number(form.from_card_id))
-  // console.log(props.cards.filter(
-  //   (card) =>
-  //     Number(card.id) !== Number(form.from_card_id) &&
-  //     card.currency === fromCard.value.currency,
-  // ))
-  // return props.cards.filter(
-  //   (card) =>
-  //     Number(card.id) !== Number(form.from_card_id) &&
-  //     card.currency === fromCard.value.currency,
-  // )
 })
 
 // When the list of cards changes
@@ -110,12 +100,12 @@ function submit() {
     @submit.prevent="submit"
   >
     <h2 class="text-lg font-bold">
-      Переказ між картками
+      {{ $t("transferForm.transferBetweenCards") }}
     </h2>
 
     <!-- Card from which the transfer will be made -->
     <label>
-      З картки
+      {{ $t("transferForm.fromCard") }}
 
       <select
         v-model="form.from_card_id"
@@ -123,7 +113,7 @@ function submit() {
         :disabled="!cards.length"
       >
         <option value="" disabled>
-          Оберіть картку
+          {{ $t("transferForm.selectCard") }}
         </option>
 
         <option
@@ -142,7 +132,7 @@ function submit() {
 
     <!-- Card to which the transfer will be made -->
     <label>
-      На картку
+      {{ $t("transferForm.toCard") }}
 
       <select
         v-model="form.to_card_id"
@@ -150,7 +140,7 @@ function submit() {
         :disabled="!cards.length"
       >
         <option value="" disabled>
-          Оберіть картку
+          {{ $t("transferForm.selectCard") }}
         </option>
 
         <option
@@ -169,7 +159,7 @@ function submit() {
 
     <!-- Amount -->
     <label>
-      Сума
+      {{ $t("transferForm.sum") }}
 
       <input
         v-model="form.amount"
@@ -182,7 +172,7 @@ function submit() {
 
     <!-- Currency is determined automatically -->
     <label>
-      Валюта
+      {{ $t("transferForm.currency") }}
 
       <select
         v-model="form.currency"
@@ -194,14 +184,6 @@ function submit() {
       </select>
     </label>
 
-    <!-- <p
-      v-if="fromCard && !availableToCards.length"
-      class="text-sm text-red-600"
-    >
-      Немає іншої картки з валютою
-      {{ fromCard.currency.toUpperCase() }}.
-    </p> -->
-
     <button
       class="btn btn-primary w-full"
       type="submit"
@@ -211,7 +193,7 @@ function submit() {
         !availableToCards.length
       "
     >
-      Переказати
+      {{ $t("transferForm.transfer") }}
     </button>
   </form>
 </template>

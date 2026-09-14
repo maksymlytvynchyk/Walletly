@@ -21,11 +21,11 @@ defineEmits(['refresh'])
   <div class="mb-7 flex items-end justify-between">
     <div>
       <p class="text-xs font-bold tracking-[0.18em] text-brand-700">
-        ОГЛЯД
+        {{ $t("dashboardTop.review") }}
       </p>
 
       <h1 class="mt-1 text-3xl font-bold tracking-tight">
-        Мої фінанси
+        {{ $t("dashboardTop.appName") }}
       </h1>
     </div>
 
@@ -34,7 +34,7 @@ defineEmits(['refresh'])
       :disabled="loading"
       @click="$emit('refresh')"
     >
-      Оновити
+      {{ $t("dashboardTop.refresh") }}
     </button>
   </div>
 
@@ -42,7 +42,7 @@ defineEmits(['refresh'])
     class="mb-6 rounded-2xl bg-linear-to-br from-brand-700 to-brand-500 p-7 text-white shadow-lg shadow-brand-700/15"
   >
     <p class="text-sm text-brand-50">
-      Баланс
+      {{ $t("dashboardTop.balance") }}
     </p>
 
     <div class="mt-4 grid gap-4 sm:grid-cols-3">
