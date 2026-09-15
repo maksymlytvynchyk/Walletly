@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 # Build Vue frontend
-FROM node:24.15.0 AS frontend-builder
+FROM node:24 AS frontend-builder
 
 WORKDIR /frontend
 
@@ -12,7 +12,7 @@ RUN npm run build
 
 
 # Build FastAPI backend
-FROM python:3.14.5
+FROM python:3
 
 WORKDIR /app
 
