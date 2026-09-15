@@ -5,7 +5,7 @@ FROM node:24.15.0 AS frontend-builder
 WORKDIR /frontend
 
 COPY frontend/package*.json ./
-RUN --network=host npm ci
+RUN npm ci
 
 COPY frontend/ ./
 RUN npm run build
