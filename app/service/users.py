@@ -9,22 +9,31 @@ from app.security import hash_password, verify_password
 
 # Service functions for user management, including registration and login
 async def create_user(db: AsyncSession, payload: UserRegistrationRequest) -> UserResponse:
-    if await users_repository.get_user_by_full_name(db, payload.full_name):
-        raise HTTPException(
-            status_code=409,
-            detail="A user with this full name already exists"
-        )
+    # if await users_repository.get_user_by_full_name(db, payload.full_name):
+    #     raise HTTPException(
+    #         status_code=409,
+    #         detail={
+    #             "field": "full_name",
+    #             "code": "full_name_already_exists",
+    #         }
+    #     )
 
     if await users_repository.get_user_by_phone(db, payload.phone):
         raise HTTPException(
             status_code=409, 
-            detail="A user with this phone already exists"
+            detail={
+                "field": "phone",
+                "code": "phone_already_exists",
+            }
         )
     
     if await users_repository.get_user_by_email(db, payload.email):
         raise HTTPException(
             status_code=409,
-            detail="A user with this email already exists",
+            detail={
+                "field": "email",
+                "code": "email_already_exists",
+            }
         )
     tax_id = await generate_tax_id(db, payload.birth_date, payload.gender)
     try:
@@ -49,7 +58,12 @@ async def create_user(db: AsyncSession, payload: UserRegistrationRequest) -> Use
 async def login_user(db: AsyncSession, payload: UserLoginRequest) -> AuthResponse:
     user = await users_repository.get_user_by_phone(db, payload.phone)
     if not user or not verify_password(payload.password, user.password_hash):
-        raise HTTPException(status_code=401, detail="Invalid phone number or password")
+        raise HTTPException(
+            status_code=401, 
+            detail={
+                "field": "password",
+                "code": "invalid_credentials",
+            })
 
     user.access_token = secrets.token_urlsafe(32)
     await db.commit()

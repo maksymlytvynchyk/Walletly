@@ -1,13 +1,18 @@
 <script setup>
-import { computed, reactive, watch } from 'vue'
+import { computed, reactive, watch, ref } from 'vue'
 
 const props = defineProps({
   cards: {
     type: Array,
     default: () => [],
   },
+  submitAction: {
+    type: Function,
+    required: true,
+  },
 })
 
+const fieldErrors = ref({})
 const emit = defineEmits(['submit'])
 
 const form = reactive({
@@ -70,35 +75,23 @@ watch(
   { immediate: true },
 )
 
-function submit() {
-  if (!form.from_card_id || !form.to_card_id) {
+async function submit() {
+  fieldErrors.value = {}
+
+  const result = await props.submitAction({ ...form })
+
+  fieldErrors.value = result.fieldErrors
+
+  if (!result.success) {
     return
   }
-
-  if (Number(form.from_card_id) === Number(form.to_card_id)) {
-    return
-  }
-
-  if (!form.amount || Number(form.amount) <= 0) {
-    return
-  }
-
-  emit('submit', {
-    from_card_id: Number(form.from_card_id),
-    to_card_id: Number(form.to_card_id),
-    amount: Number(form.amount),
-    currency: form.currency,
-  })
 
   form.amount = ''
 }
 </script>
 
 <template>
-  <form
-    class="card space-y-3"
-    @submit.prevent="submit"
-  >
+  <form class="card space-y-3" @submit.prevent="submit">
     <h2 class="text-lg font-bold">
       {{ $t("transferForm.transferBetweenCards") }}
     </h2>
@@ -107,20 +100,12 @@ function submit() {
     <label>
       {{ $t("transferForm.fromCard") }}
 
-      <select
-        v-model="form.from_card_id"
-        required
-        :disabled="!cards.length"
-      >
+      <select v-model="form.from_card_id" required :disabled="!cards.length">
         <option value="" disabled>
           {{ $t("transferForm.selectCard") }}
         </option>
 
-        <option
-          v-for="card in cards"
-          :key="card.id"
-          :value="card.id"
-        >
+        <option v-for="card in cards" :key="card.id" :value="card.id">
           {{ card.payment_system.toUpperCase() }}
           •••• {{ card.card_number.slice(-4) }}
           —
@@ -128,26 +113,21 @@ function submit() {
           {{ card.currency.toUpperCase() }}
         </option>
       </select>
+      <p v-if="fieldErrors.card_id" class="mt-1 text-sm text-red-600">
+        {{ $t(`errors.${fieldErrors.card_id}`) }}
+      </p>
     </label>
 
     <!-- Card to which the transfer will be made -->
     <label>
       {{ $t("transferForm.toCard") }}
 
-      <select
-        v-model="form.to_card_id"
-        required
-        :disabled="!cards.length"
-      >
+      <select v-model="form.to_card_id" required :disabled="!cards.length">
         <option value="" disabled>
           {{ $t("transferForm.selectCard") }}
         </option>
 
-        <option
-          v-for="card in availableToCards"
-          :key="card.id"
-          :value="card.id"
-        >
+        <option v-for="card in availableToCards" :key="card.id" :value="card.id">
           {{ card.payment_system.toUpperCase() }}
           •••• {{ card.card_number.slice(-4) }}
           —
@@ -155,44 +135,39 @@ function submit() {
           {{ card.currency.toUpperCase() }}
         </option>
       </select>
+      <p v-if="fieldErrors.card_id" class="mt-1 text-sm text-red-600">
+        {{ $t(`errors.${fieldErrors.card_id}`) }}
+      </p>
     </label>
 
     <!-- Amount -->
     <label>
       {{ $t("transferForm.sum") }}
 
-      <input
-        v-model="form.amount"
-        type="number"
-        min="0.01"
-        step="0.01"
-        required
-      />
+      <input v-model="form.amount" type="number" min="0.01" step="0.01" required />
+      <p v-if="fieldErrors.amount" class="mt-1 text-sm text-red-600">
+        {{ $t(`errors.${fieldErrors.amount}`) }}
+      </p>
     </label>
 
     <!-- Currency is determined automatically -->
     <label>
       {{ $t("transferForm.currency") }}
 
-      <select
-        v-model="form.currency"
-        disabled
-      >
+      <select v-model="form.currency" disabled>
         <option value="uah">UAH</option>
         <option value="usd">USD</option>
         <option value="eur">EUR</option>
       </select>
+      <p v-if="fieldErrors.currency" class="mt-1 text-sm text-red-600">
+        {{ $t(`errors.${fieldErrors.currency}`) }}
+      </p>
     </label>
 
-    <button
-      class="btn btn-primary w-full"
-      type="submit"
-      :disabled="
-        !cards.length ||
-        !fromCard ||
-        !availableToCards.length
-      "
-    >
+    <button class="btn btn-primary w-full" type="submit" :disabled="!cards.length ||
+      !fromCard ||
+      !availableToCards.length
+      ">
       {{ $t("transferForm.transfer") }}
     </button>
   </form>

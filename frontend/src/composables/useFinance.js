@@ -36,7 +36,7 @@ export function useFinance() {
     setTimeout(() => {
       notice.value = "";
       error.value = "";
-    }, 4000);
+    }, 10000);
   }
 
   // Load cards and operations
@@ -58,16 +58,48 @@ export function useFinance() {
     }
   }
 
+  function getFieldErrors(exception) {
+    // 401 / 409: detail = { field, code }
+    if (exception.field && exception.code) {
+      return {
+        [exception.field]: exception.code,
+      };
+    }
+
+    // 422: detail = [{ type, loc, msg }]
+    const fieldErrors = {};
+
+    for (const error of exception.details || []) {
+      const field = error.loc?.at(-1);
+
+      if (field) {
+        fieldErrors[field] = error.type;
+      }
+    }
+
+    return fieldErrors;
+  }
+
   // Authentication
   async function signIn(phone, password) {
     phone = phone.trim();
 
     if (!phone) {
-      return message("Введіть номер телефону.", true);
+      return {
+        success: false,
+        fieldErrors: {
+          phone: "phone_required",
+        },
+      };
     }
 
     if (!password) {
-      return message("Введіть пароль.", true);
+      return {
+        success: false,
+        fieldErrors: {
+          password: "password_required",
+        },
+      };
     }
 
     loading.value = true;
@@ -89,13 +121,32 @@ export function useFinance() {
       await loadDashboard();
 
       message("Ви успішно увійшли.");
+
+      return {
+        success: true,
+        fieldErrors: {},
+      };
     } catch (exception) {
       clearToken();
 
       user.value = null;
       authenticated.value = false;
 
-      message(exception.message || "Невірний номер телефону або пароль.", true);
+      const fieldErrors = getFieldErrors(exception);
+
+      if (Object.keys(fieldErrors).length) {
+        return {
+          success: false,
+          fieldErrors,
+        };
+      }
+
+      message(exception.message, true);
+
+      return {
+        success: false,
+        fieldErrors: {},
+      };
     } finally {
       loading.value = false;
     }
@@ -113,10 +164,27 @@ export function useFinance() {
 
       message("Користувача успішно створено.");
 
-      return true;
+      // return true;
+      return {
+        success: true,
+        fieldErrors: {},
+      };
     } catch (exception) {
+      const fieldErrors = getFieldErrors(exception);
+
+      if (Object.keys(fieldErrors).length) {
+        return {
+          success: false,
+          fieldErrors,
+        };
+      }
+
       message(exception.message, true);
-      return false;
+
+      return {
+        success: false,
+        fieldErrors: {},
+      };
     } finally {
       loading.value = false;
     }
@@ -166,8 +234,26 @@ export function useFinance() {
       message("Картку створено.");
 
       await loadDashboard();
+
+      return {
+        success: true,
+        fieldErrors: {},
+      };
     } catch (exception) {
+      const fieldErrors = getFieldErrors(exception);
+
+      if (Object.keys(fieldErrors).length) {
+        return {
+          success: false,
+          fieldErrors,
+        };
+      }
+
       message(exception.message, true);
+      return {
+        success: false,
+        fieldErrors: {},
+      };
     }
   }
 
@@ -189,8 +275,26 @@ export function useFinance() {
       message("Операцію додано.");
 
       await loadDashboard();
+
+      return {
+        success: true,
+        fieldErrors: {},
+      };
     } catch (exception) {
+      const fieldErrors = getFieldErrors(exception);
+
+      if (Object.keys(fieldErrors).length) {
+        return {
+          success: false,
+          fieldErrors,
+        };
+      }
       message(exception.message, true);
+
+      return {
+        success: false,
+        fieldErrors: {},
+      };
     }
   }
 
@@ -215,8 +319,26 @@ export function useFinance() {
       message("Переказ виконано.");
 
       await loadDashboard();
+
+      return {
+        success: true,
+        fieldErrors: {},
+      };
     } catch (exception) {
+      const fieldErrors = getFieldErrors(exception);
+
+      if (Object.keys(fieldErrors).length) {
+        return {
+          success: false,
+          fieldErrors,
+        };
+      }
       message(exception.message, true);
+
+      return {
+        success: false,
+        fieldErrors: {},
+      };
     }
   }
 

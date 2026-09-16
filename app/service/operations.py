@@ -12,6 +12,8 @@ from app.schemas import (
 from app.service.exchange_service import get_exchange_rate
 
 # Service functions for managing financial operations, including creating operations and transferring funds between cards
+
+
 async def create_operation(
     db: AsyncSession,
     user_id: int,
@@ -28,14 +30,20 @@ async def create_operation(
     if not card:
         raise HTTPException(
             status_code=404,
-            detail="The card was not found",
+            detail={
+                "field": "card_id",
+                "code": "card_not_found",
+            },
         )
 
     # Check if the card belongs to the user
     if card.user_id != user_id:
         raise HTTPException(
             status_code=403,
-            detail="The card does not belong to the user",
+            detail={
+                "field": "card_id",
+                "code": "card_not_belong_to_user",
+            },
         )
 
     # The currency of the operation must match
@@ -43,7 +51,10 @@ async def create_operation(
     if card.currency != payload.currency:
         raise HTTPException(
             status_code=400,
-            detail="The currency of the operation does not match the card's currency",
+            detail={
+                "field": "currency",
+                "code": "invalid_currency",
+            },
         )
 
     # Income operation: add the amount to the card balance
@@ -56,17 +67,20 @@ async def create_operation(
         if card.balance < payload.amount:
             raise HTTPException(
                 status_code=400,
-                detail="Not enough funds on the card",
+                detail={
+                    "field": "amount",
+                    "code": "not_enough_funds",
+                },
             )
 
         card.balance -= payload.amount
 
     # Transfer operation: not allowed here, use the transfer endpoint
-    elif payload.type == OperationTypeEnum.TRANSFER:
-        raise HTTPException(
-            status_code=400,
-            detail="For transfers, use the dedicated endpoint",
-        )
+    # elif payload.type == OperationTypeEnum.TRANSFER:
+    #     raise HTTPException(
+    #         status_code=400,
+    #         detail="For transfers, use the dedicated endpoint",
+    #     )
 
     # Create the operation record in the database
     operation = await operations_repository.create_operation(
@@ -88,6 +102,8 @@ async def create_operation(
     return OperationResponse.model_validate(operation)
 
 # Service function to transfer funds between two cards of the same user
+
+
 async def transfer(
     db: AsyncSession,
     user_id: int,
@@ -97,7 +113,10 @@ async def transfer(
     if payload.from_card_id == payload.to_card_id:
         raise HTTPException(
             status_code=400,
-            detail="Choose different cards",
+            detail={
+                "field": "card_id",
+                "code": "same_cards_error",
+            },
         )
 
     # Get the source card (from_card) by ID
@@ -110,7 +129,10 @@ async def transfer(
     if not from_card:
         raise HTTPException(
             status_code=404,
-            detail="The card for deduction was not found",
+            detail={
+                "field": "card_id",
+                "code": "from_card_not_found",
+            },
         )
 
     # Get the destination card (to_card) by ID
@@ -123,39 +145,30 @@ async def transfer(
     if not to_card:
         raise HTTPException(
             status_code=404,
-            detail="The card for credit was not found",
+            detail={
+                "field": "card_id",
+                "code": "to_card_not_found",
+            },
         )
 
     # Check if both cards belong to the user
     if from_card.user_id != user_id:
         raise HTTPException(
             status_code=403,
-            detail="The card for deduction does not belong to the user",
+            detail={
+                "field": "card_id",
+                "code": "from_card_not_belong_to_user",
+            },
         )
-    if to_card.user_id != user_id:
-        raise HTTPException(
-            status_code=403,
-            detail="The card for credit does not belong to the user",
-        )
-
-    # # Check if the currencies of the cards match the currency of the transfer
-    # if from_card.currency != payload.currency:
-    #     raise HTTPException(
-    #         status_code=400,
-    #         detail="The currency of the card for deduction does not match the transfer currency",
-    #     )
-
-    # if to_card.currency != payload.currency:
-    #     raise HTTPException(
-    #         status_code=400,
-    #         detail="The currency of the card for credit does not match the transfer currency",
-    #     )
 
     # Check if the source card has enough funds for the transfer
     if from_card.balance < payload.amount:
         raise HTTPException(
             status_code=400,
-            detail="Not enough funds on the card for deduction",
+            detail={
+                "field": "amount",
+                "code": "not_enough_funds",
+            },
         )
 
     target_amount = payload.amount
@@ -192,6 +205,8 @@ async def transfer(
     await db.commit()
 
 # Service function to retrieve all operations for a specific user
+
+
 async def get_user_operations(
     db: AsyncSession,
     user_id: int,

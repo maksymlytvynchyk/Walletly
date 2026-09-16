@@ -1,5 +1,14 @@
 <script setup>
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
+
+const props = defineProps({
+  submitAction: {
+    type: Function,
+    required: true,
+  }
+})
+
+const fieldErrors = ref({})
 
 const emit = defineEmits(['submit'])
 
@@ -10,8 +19,16 @@ const form = reactive({
   initial_balance: 0,
 })
 
-function submit() {
-  emit('submit', { ...form })
+async function submit() {
+  fieldErrors.value = {}
+
+  const result = await props.submitAction({ ...form })
+
+  fieldErrors.value = result.fieldErrors
+
+  if (!result.success) {
+    return
+  }
 
   Object.assign(form, {
     payment_system: 'visa',
@@ -63,13 +80,10 @@ function submit() {
     <label>
       {{ $t("cardForm.initialBalance") }}
 
-      <input
-        v-model.number="form.initial_balance"
-        min="0"
-        step="0.01"
-        type="number"
-        required
-      />
+      <input v-model.number="form.initial_balance" min="0" step="0.01" type="number" required />
+      <p v-if="fieldErrors.initial_balance" class="mt-1 text-sm text-red-600">
+        {{ $t(`errors.${fieldErrors.initial_balance}`) }}
+      </p>
     </label>
 
     <label>

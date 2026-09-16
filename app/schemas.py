@@ -2,6 +2,7 @@ from datetime import date, datetime
 import re
 
 from pydantic import BaseModel, Field, field_validator
+from pydantic_core import PydanticCustomError
 from decimal import Decimal
 
 from app.enum import CardTypeEnum, CurrencyEnum, GenderEnum, OperationTypeEnum, PaymentSystemEnum
@@ -23,10 +24,10 @@ class UserRegistrationRequest(BaseModel):
     def full_name_is_valid(cls, value: str) -> str:
         value = " ".join(value.split())
         is_value_correct = value.split(" ")
-        if not value:
-            raise ValueError("Full name cannot be empty")
+        # if not value:
+        #     raise PydanticCustomError("invalid_full_name", "invalid_full_name")
         if len(is_value_correct) != 3:
-            raise ValueError("Incorrect full name format; example: Ivan Ivanovych Petrenko")
+            raise PydanticCustomError("invalid_full_name_format", "invalid_full_name_format")
         return value
 
     @field_validator("phone")
@@ -34,7 +35,7 @@ class UserRegistrationRequest(BaseModel):
     def phone_is_valid(cls, value: str) -> str:
         normalized = re.sub(r"[\s()\-]", "", value)
         if not re.fullmatch(r"\+?\d{10,15}", normalized):
-            raise ValueError("Enter a valid phone number")
+            raise PydanticCustomError("invalid_phone", "invalid_phone")
         return normalized
 
     @field_validator("email")
@@ -42,16 +43,20 @@ class UserRegistrationRequest(BaseModel):
     def email_is_valid(cls, value: str) -> str:
         value = value.strip().lower()
         if not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", value):
-            raise ValueError("Enter a valid email")
+            raise PydanticCustomError("invalid_email", "invalid_email")
         return value
 
     @field_validator("birth_date")
     @classmethod
     def birth_date_is_valid(cls, value: date) -> date:
         today = date.today()
+        min_tax_id_date = date(1899, 12, 31)
+        
+        if value < min_tax_id_date:
+            raise PydanticCustomError("invalid_birth_date_for_tax_id", "invalid_birth_date_for_tax_id")
 
         if value >= today:
-            raise ValueError("Birth date must be in the past")
+            raise PydanticCustomError("birth_date_must_be_in_past", "birth_date_must_be_in_past")
 
         age = today.year - value.year
 
@@ -59,7 +64,7 @@ class UserRegistrationRequest(BaseModel):
             age -= 1
 
         if age < 14:
-            raise ValueError("User must be at least 14 years old")
+            raise PydanticCustomError("birth_date_young", "birth_date_young")
 
         return value
     
@@ -67,7 +72,7 @@ class UserRegistrationRequest(BaseModel):
     @classmethod
     def gender_is_valid(cls, value: str) -> str:
         if value not in ["male", "female"]:
-            raise ValueError("Gender must be either 'male' or 'female'")
+            raise PydanticCustomError("invalid_gender", "invalid_gender")
         return value
 
 # User login request model
@@ -80,7 +85,7 @@ class UserLoginRequest(BaseModel):
     def phone_is_valid(cls, value: str) -> str:
         normalized = re.sub(r"[\s()\-]", "", value)
         if not re.fullmatch(r"\+?\d{10,15}", normalized):
-            raise ValueError("Enter a valid phone number")
+            raise PydanticCustomError("invalid_phone", "invalid_phone")
         return normalized
 
 # User response model
@@ -111,7 +116,7 @@ class CreateCardRequest(BaseModel):
     @classmethod
     def validate_initial_balance(cls, value: Decimal) -> Decimal:
         if value < 0:
-            raise ValueError("Початковий баланс не може бути від'ємним")
+            raise PydanticCustomError("invalid_initial_balance", "invalid_initial_balance")
 
         return value
 
@@ -123,7 +128,7 @@ class CardResponse(BaseModel):
     card_number: str
     iban: str
     bank_code: str
-    cvv: str
+    # cvv: str
     expires_at: date
     payment_system: PaymentSystemEnum
     card_type: CardTypeEnum
@@ -143,7 +148,7 @@ class OperationRequest(BaseModel):
     @classmethod
     def amount_must_be_positive(cls, value: Decimal) -> Decimal:
         if value <= 0:
-            raise ValueError("Amount must be positive")
+            raise PydanticCustomError("invalid_amount", "invalid_amount")
         return value
 
 # Operation response model
@@ -168,20 +173,20 @@ class TransferCreateSchema(BaseModel):
 
     @field_validator('amount')
     @classmethod
-    def amount_must_be_positive(cls, v: Decimal) -> Decimal:
+    def amount_must_be_positive(cls, value: Decimal) -> Decimal:
         # Check is value positive
-        if v <= 0:
-            raise ValueError("Amount must be positive")
+        if value <= 0:
+            raise PydanticCustomError("invalid_amount", "invalid_amount")
         # Return value if it's positive
-        return v
+        return value
 
     @field_validator('from_card_id', 'to_card_id')
     @classmethod
-    def card_ids_must_be_different(cls, v: int, info) -> int:
+    def card_ids_must_be_different(cls, value: int, info) -> int:
         # Check if card ids are different
-        if "from_card_id" in info.data and v == info.data["from_card_id"]:
+        if "from_card_id" in info.data and value == info.data["from_card_id"]:
             raise ValueError("Same cards ids")
-        return v
+        return value
 
 # Total balance response model
 class TotalBalance(BaseModel):

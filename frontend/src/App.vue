@@ -1,5 +1,6 @@
 <script setup>
 import { onMounted } from 'vue'
+import { ref } from 'vue'
 
 import AppHeader from './components/AppHeader.vue'
 import AuthPanel from './components/AuthPanel.vue'
@@ -13,6 +14,9 @@ import CardList from './components/CardList.vue'
 import { useFinance } from './composables/useFinance'
 
 const finance = useFinance()
+
+const cardFieldErrors = ref({})
+
 
 onMounted(() => {
   finance.restoreSession()
@@ -57,7 +61,7 @@ onMounted(() => {
       v-else-if="!finance.authenticated.value"
       :loading="finance.loading.value"
       :register="finance.register"
-      @login="finance.signIn"
+      :sign-in="finance.signIn"
     />
 
     <!-- Dashboard -->
@@ -80,19 +84,21 @@ onMounted(() => {
 
         <!-- Створення картки -->
         <CardForm
-          @submit="finance.createCard"
+          :submit-action="finance.createCard"
         />
 
         <!-- Створення операції -->
         <OperationForm
+          :field-errors="cardFieldErrors"
           :cards="finance.cards.value"
-          @submit="finance.createOperation"
+          :submit-action="finance.createOperation"
         />
 
         <!-- Переказ -->
         <TransferForm
+          :field-errors="cardFieldErrors"
           :cards="finance.cards.value"
-          @submit="finance.transfer"
+          :submit-action="finance.transfer"
         />
 
       </div>

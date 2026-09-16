@@ -10,8 +10,15 @@ const props = defineProps({
     type: Function,
     required: true,
   },
+
+  signIn: {
+    type: Function,
+    required: true,
+  },
 })
 
+const registerFieldErrors = ref({})
+const loginFieldErrors = ref({})
 const emit = defineEmits(['login'])
 
 const mode = ref('login')
@@ -24,15 +31,21 @@ const showRegister = () => {
   mode.value = 'register'
 }
 
-const handleLogin = (phone, password) => {
-  emit('login', phone, password)
+const handleLogin = async (phone, password) => {
+  loginFieldErrors.value = {}
+  const result = await props.signIn(phone, password)
+  console.log(result.fieldErrors);
+  loginFieldErrors.value = result.fieldErrors
 }
 
 const handleRegister = async (payload) => {
-  const success = await props.register(payload)
+  registerFieldErrors.value = {}
+  const result = await props.register(payload)
 
-  if (success) {
-    mode.value = 'login'
+  registerFieldErrors.value = result.fieldErrors
+
+  if (result.success) {
+    mode.value = "login"
   }
 }
 </script>
@@ -54,27 +67,15 @@ const handleRegister = async (payload) => {
       }}
     </p>
 
-    <LoginForm
-      v-if="mode === 'login'"
-      :loading="loading"
-      @submit="handleLogin"
-    />
+    <LoginForm v-if="mode === 'login'" :loading="loading" :field-errors="loginFieldErrors" @submit="handleLogin" />
 
-    <RegisterForm
-      v-else
-      :loading="loading"
-      @submit="handleRegister"
-    />
+    <RegisterForm v-else :loading="loading" :field-errors="registerFieldErrors" @submit="handleRegister" />
 
     <div class="mt-6 text-center text-sm text-slate-600">
       <template v-if="mode === 'login'">
         {{ $t("auth.registerDescription") }}
 
-        <button
-          type="button"
-          class="font-semibold text-brand-700 hover:underline"
-          @click="showRegister"
-        >
+        <button type="button" class="font-semibold text-brand-700 hover:underline" @click="showRegister">
           {{ $t("auth.register") }}
         </button>
       </template>
@@ -82,11 +83,7 @@ const handleRegister = async (payload) => {
       <template v-else>
         {{ $t("register.haveAcc") }}
 
-        <button
-          type="button"
-          class="font-semibold text-brand-700 hover:underline"
-          @click="showLogin"
-        >
+        <button type="button" class="font-semibold text-brand-700 hover:underline" @click="showLogin">
           {{ $t("auth.login") }}
         </button>
       </template>

@@ -25,11 +25,27 @@ export async function api(path, options = {}) {
   const body = await response.json().catch(() => null);
 
   if (!response.ok) {
-    const detail = Array.isArray(body?.detail)
-      ? body.detail.map((item) => item.msg).join(", ")
-      : body?.detail;
+    const detail = body?.detail;
 
-    throw new Error(detail || "Не вдалося виконати запит.");
+    let message = "Не вдалося виконати запит.";
+
+    if (Array.isArray(detail)) {
+      message = detail.map((item) => item.msg).join(", ");
+    } else if (typeof detail === "object" && detail !== null) {
+      message = detail.message || message;
+    } else if (typeof detail === "string") {
+      message = detail;
+    }
+
+    const error = new Error(message);
+
+    error.details = Array.isArray(detail) ? detail : [];
+    error.field =
+      typeof detail === "object" && detail !== null ? detail.field : null;
+    error.code =
+      typeof detail === "object" && detail !== null ? detail.code : null;
+
+    throw error;
   }
   return body;
 }

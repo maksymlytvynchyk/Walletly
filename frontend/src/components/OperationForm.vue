@@ -1,13 +1,18 @@
 <script setup>
-import { reactive, watch } from 'vue'
+import { reactive, watch, ref } from 'vue'
 
 const props = defineProps({
   cards: {
     type: Array,
     default: () => [],
   },
+  submitAction: {
+    type: Function,
+    required: true,
+  },
 })
 
+const fieldErrors = ref({})
 const emit = defineEmits(['submit'])
 
 const form = reactive({
@@ -54,14 +59,25 @@ watch(
   },
 )
 
-function submit() {
-  emit('submit', {
-    ...form,
-    card_id: Number(form.card_id),
-    amount: Number(form.amount),
-    category: form.category || null,
-    subcategory: form.subcategory || null,
-  })
+async function submit() {
+  fieldErrors.value = {}
+
+  const result = await props.submitAction({ ...form })
+
+  fieldErrors.value = result.fieldErrors
+
+  if (!result.success) {
+    return
+  }
+
+
+  // emit('submit', {
+  //   ...form,
+  //   card_id: Number(form.card_id),
+  //   amount: Number(form.amount),
+  //   category: form.category || null,
+  //   subcategory: form.subcategory || null,
+  // })
 
   Object.assign(form, {
     type: 'income',
@@ -117,6 +133,9 @@ function submit() {
           — {{ card.balance }} {{ card.currency.toUpperCase() }}
         </option>
       </select>
+      <p v-if="fieldErrors.card_id" class="mt-1 text-sm text-red-600">
+        {{ $t(`errors.${fieldErrors.card_id}`) }}
+      </p>
     </label>
 
     <!-- Сума -->
@@ -130,6 +149,9 @@ function submit() {
         type="number"
         required
       />
+      <p v-if="fieldErrors.amount" class="mt-1 text-sm text-red-600">
+        {{ $t(`errors.${fieldErrors.amount}`) }}
+      </p>
     </label>
 
     <!-- Валюта -->
