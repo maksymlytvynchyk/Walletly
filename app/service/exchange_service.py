@@ -14,8 +14,7 @@ FALLBACK_RATES: Dict[Tuple[str, str], Decimal] = {
 
 # Service function to get the exchange rate between two currencies, using an external API with a fallback to predefined rates
 async def get_exchange_rate(base: CurrencyEnum, target: CurrencyEnum) -> Decimal:
-    
-    url = f"https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/latest/currencies/{base}.json"
+    url = f"https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/{base}.json"
     
     timeout = aiohttp.ClientTimeout(total=5.0)  # Set a timeout of 5 seconds
     
